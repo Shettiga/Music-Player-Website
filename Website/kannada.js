@@ -63,6 +63,7 @@ let songs = [];  // Define an array to store song data
 function playSongByIndex(index) {
     makeAllPlays();
     songIndex = index;
+    console.log('Song index:', songIndex); // Log the song index
     initializeAudioElement(songIndex);
 
     const bottomPlayer = document.getElementById('bottomPlayer');
@@ -111,6 +112,21 @@ displaySongs();
 
 // Function to initialize the audio element with the first song
 function initializeAudioElement(songIndex) {
+    console.log('Initializing audio for index:', songIndex);
+    // Check if the songs array contains the desired index
+    if (songIndex >= 0 && songIndex < songs.length) {
+        const song = songs[songIndex];
+        if (song && song.musicUrl) {
+            audioElement.src = song.musicUrl;
+            // Rest of your initialization code...
+        } else {
+            console.error('Missing musicUrl for index:', songIndex);
+        }
+    } else {
+        console.error('Invalid song index:', songIndex);
+    }
+
+
     audioElement.src = songs[songIndex].musicUrl;
     masterSongName.innerText = songs[songIndex].title;
     audioElement.currentTime = 0;
@@ -136,6 +152,11 @@ Array.from(document.getElementsByClassName('songItemPlay')).forEach((element)=>{
         gif.style.opacity = 1;
         masterPlay.classList.remove('fa-play-circle');
         masterPlay.classList.add('fa-pause-circle');
+
+        audioElement.addEventListener('error', function(e) {
+            console.error('Error occurred while loading the audio:', e);
+        });
+        
     })
 })
 
@@ -171,9 +192,19 @@ document.getElementById('previous').addEventListener('click', ()=>{
 })
 
 function changeImg(){
-    const carou=document.querySelector(".wrapper");
-    const firstImg=carou.firstElementChild;
-    carou.removeChild(firstImg);
-    carou.appendChild(firstImg);
+    const carou = document.querySelector(".bottom");
+    if (carou) {
+        const firstImg = carou.firstElementChild;
+        if (firstImg) {
+            carou.removeChild(firstImg);
+            carou.appendChild(firstImg);
+        } else {
+            console.error("No first child element found in '.wrapper'");
+        }
+    } else {
+        console.error("Element with class '.wrapper' not found");
+    }
 }
-setInterval(changeImg,2000);
+
+setInterval(changeImg, 2000);
+
