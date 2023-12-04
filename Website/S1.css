@@ -92,7 +92,14 @@ nav a {
 .categories {
     position: relative;
     text-align: center;
+<<<<<<< HEAD
     margin:auto; 
+=======
+    margin: 20px auto; /* Adjusted margin */
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+>>>>>>> ae996a29c68b9c534ef2b7487752818a02f69b13
 }
 
 .index-category-box {

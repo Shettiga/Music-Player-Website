@@ -1,12 +1,3 @@
-let songIndex = 0;
-let audioElement = new Audio();
-let masterPlay = document.getElementById('masterPlay');
-let myProgressBar = document.getElementById('myProgressBar');
-let gif = document.getElementById('gif');
-let masterSongName = document.getElementById('masterSongName');
-let songItems = Array.from(document.getElementsByClassName('songItem'));
-
-// Initialize Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyCRDHxxkCXyNZ9BdJhDlZKpOkLu2FZHmh8",
     authDomain: "auth-form-2eb89.firebaseapp.com",
@@ -19,16 +10,18 @@ const firebaseConfig = {
     const firebaseApp = firebase.initializeApp(firebaseConfig);
     const db = firebaseApp.database();
 
+let songIndex = 0;
+let audioElement = new Audio();
+let masterPlay = document.getElementById('masterPlay');
+let myProgressBar = document.getElementById('myProgressBar');
+let gif = document.getElementById('gif');
+let masterSongName = document.getElementById('masterSongName');
+let songItems = Array.from(document.getElementsByClassName('songItem'));
 
-// Function to initialize the audio element with the first song
-function initializeAudioElement(songIndex) {
-    audioElement.src = songs[songIndex].musicUrl;
-    masterSongName.innerText = songs[songIndex].title;
-    audioElement.currentTime = 0;
-    audioElement.play();
-    masterPlay.classList.remove('fa-play-circle');
-    masterPlay.classList.add('fa-pause-circle');
-}
+
+// Initialize Firebase
+
+
 
 const makeAllPlays = () => {
     Array.from(document.getElementsByClassName('songItemPlay')).forEach((element) => {
@@ -66,14 +59,25 @@ myProgressBar.addEventListener('change', () => {
 // Display songs from Firebase
 let songs = [];  // Define an array to store song data
 
-// Display songs from Firebase
+
+function playSongByIndex(index) {
+    makeAllPlays();
+    songIndex = index;
+    console.log('Song index:', songIndex); // Log the song index
+    initializeAudioElement(songIndex);
+
+    const bottomPlayer = document.getElementById('bottomPlayer');
+    bottomPlayer.querySelector('img').src = songs[songIndex].imageUrl;
+    bottomPlayer.querySelector('span').innerText = songs[songIndex].title;
+}
+
 function displaySongs() {
     const songsRef = db.ref('music');
 
     songsRef.once('value', (snapshot) => {
         snapshot.forEach((childSnapshot) => {
             const songData = childSnapshot.val();
-            songs.push(songData);  // Add the song data to the array
+            songs.push(songData);
 
             const songItem = document.createElement('div');
             songItem.classList.add('songItem');
@@ -86,17 +90,12 @@ function displaySongs() {
             `;
 
             songItem.addEventListener('click', () => {
-                makeAllPlays();
-                songIndex = parseInt(childSnapshot.key);
-                initializeAudioElement(songIndex);
+                playSongByIndex(parseInt(childSnapshot.key));
             });
 
-            // Add click event listener to play the song when the play button is clicked
             const playButton = songItem.querySelector('.songItemPlay');
             playButton.addEventListener('click', () => {
-                makeAllPlays();
-                songIndex = parseInt(childSnapshot.key);
-                initializeAudioElement(songIndex);
+                playSongByIndex(parseInt(childSnapshot.key));
             });
 
             songItems.push(songItem);
@@ -113,34 +112,33 @@ displaySongs();
 
 // Function to initialize the audio element with the first song
 function initializeAudioElement(songIndex) {
-    audioElement.src = songs[songIndex].musicUrl;  // Set the correct URL from Firebase
+    console.log('Initializing audio for index:', songIndex);
+    // Check if the songs array contains the desired index
+    if (songIndex >= 0 && songIndex < songs.length) {
+        const song = songs[songIndex];
+        if (song && song.musicUrl) {
+            audioElement.src = song.musicUrl;
+            // Rest of your initialization code...
+        } else {
+            console.error('Missing musicUrl for index:', songIndex);
+        }
+    } else {
+        console.error('Invalid song index:', songIndex);
+    }
+
+
+    audioElement.src = songs[songIndex].musicUrl;
     masterSongName.innerText = songs[songIndex].title;
     audioElement.currentTime = 0;
     audioElement.play();
     masterPlay.classList.remove('fa-play-circle');
     masterPlay.classList.add('fa-pause-circle');
+
+    // Set details in the "bottom" div
+    const bottomSongInfo = document.querySelector('.bottom .songInfo');
+    bottomSongInfo.querySelector('img').src = songs[songIndex].imageUrl;
+    bottomSongInfo.querySelector('span').innerText = songs[songIndex].title;
 }
-
-// let songs = [
-//     {songName: "Neene Modalu Neene Kone  Kiss  Viraat, Sreeleela  A P Arjun  Adi Hari  Shreya Ghoshal", filePath: "kannada songs\Neene Modalu Neene Kone .mp3", coverPath: "covers/1.jpg"},
-//     {songName: "Kantara - Singara Siriye Vijay PrakashAnanya Bhat Ajaneesh Loknath Rishab ShettyHombale Films", filePath: "Singara Siriye.mp3", coverPath: "covers/2.jpg"},
-//     {songName: "Sapta Sagaradaache Ello - Title Track  Rakshit Shetty  Rukmini  Hemanth M Rao Charan Raj  Kapil", filePath: "Sapta Sagaradaache Ellol.mp3", coverPath: "covers/3.jpg"},
-//     {songName: "Belakina Kavithe Video Song  Banaras Kannada  Zaid Khan  Sonal Monteiro  B.Ajaneesh Loknath", filePath: "Belakina Kavithe .mp3", coverPath: "covers/4.jpg"},
-//     {songName: "Janji-Heroes-Tonight-feat-Johnning-NCS-Release", filePath: "songs/5.mp3", coverPath: "covers/5.jpg"},
-//     {songName: "Rabba - Salam-e-Ishq", filePath: "songs/2.mp3", coverPath: "covers/6.jpg"},
-//     {songName: "Sakhiyaan - Salam-e-Ishq", filePath: "songs/2.mp3", coverPath: "covers/7.jpg"},
-//     {songName: "Bhula Dena - Salam-e-Ishq", filePath: "songs/2.mp3", coverPath: "covers/8.jpg"},
-//     {songName: "Tumhari Kasam - Salam-e-Ishq", filePath: "songs/2.mp3", coverPath: "covers/9.jpg"},
-//     {songName: "Na Jaana - Salam-e-Ishq", filePath: "songs/4.mp3", coverPath: "covers/10.jpg"},
-// ]
-
-// songItems.forEach((element, i)=>{ 
-//     element.getElementsByTagName("img")[0].src = songs[i].coverPath; 
-//     element.getElementsByClassName("songName")[0].innerText = songs[i].songName; 
-// })
- 
-
-
 Array.from(document.getElementsByClassName('songItemPlay')).forEach((element)=>{
     element.addEventListener('click', (e)=>{ 
         makeAllPlays();
@@ -154,6 +152,11 @@ Array.from(document.getElementsByClassName('songItemPlay')).forEach((element)=>{
         gif.style.opacity = 1;
         masterPlay.classList.remove('fa-play-circle');
         masterPlay.classList.add('fa-pause-circle');
+
+        audioElement.addEventListener('error', function(e) {
+            console.error('Error occurred while loading the audio:', e);
+        });
+        
     })
 })
 
@@ -189,9 +192,19 @@ document.getElementById('previous').addEventListener('click', ()=>{
 })
 
 function changeImg(){
-    const carou=document.querySelector(".wrapper");
-    const firstImg=carou.firstElementChild;
-    carou.removeChild(firstImg);
-    carou.appendChild(firstImg);
+    const carou = document.querySelector(".bottom");
+    if (carou) {
+        const firstImg = carou.firstElementChild;
+        if (firstImg) {
+            carou.removeChild(firstImg);
+            carou.appendChild(firstImg);
+        } else {
+            console.error("No first child element found in '.wrapper'");
+        }
+    } else {
+        console.error("Element with class '.wrapper' not found");
+    }
 }
-setInterval(changeImg,2000);
+
+setInterval(changeImg, 2000);
+
