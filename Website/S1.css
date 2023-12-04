@@ -87,18 +87,12 @@ nav a {
     }
 
 }
-.container2{
-    color: azure;
-    text-align: center;
-    border: azure 2px solid;
-    border-radius: 25px;
-}
+
 
 .categories {
+    position: relative;
     text-align: center;
-    margin: 20px auto; /* Adjusted margin */
-    display: flex;
-    flex-direction: row;
+    margin:auto; 
 }
 
 .index-category-box {
@@ -111,7 +105,7 @@ nav a {
     justify-content: center;
     align-items: center;
     position: relative;
-    margin: 2% 4vw;
+    margin: 2% auto;
     z-index: -1;
 }
 
@@ -148,4 +142,22 @@ footer {
     position: fixed;
     bottom: 0;
     width: 100%;
+}
+
+.mus{
+    margin: auto;
+}
+.abtsec{
+    margin: auto;
+    width: 70%;
+    background-color: cornsilk;
+    padding: 5%;
+    border-radius: 10px;
+}
+.cntsec{
+    margin: 10% auto;
+    width: 70%;
+    background-color: rgb(25, 148, 218);
+    padding: 5%;
+    border-radius: 10px;
 }
