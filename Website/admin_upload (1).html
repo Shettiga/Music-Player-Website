@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Page</title>
+    <!-- Include Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.3/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.3/firebase-database.js"></script>
+    <!-- Include your Firebase configuration -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1-0/firebase.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: center;
+            text-align: center;
+            background-attachment: fixed;
+        }
+
+        h1 {
+            color: #f8f5f5;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 20px auto;
+            background-color: rgb(255, 255, 255);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        alert {
+            background-color: #f44336;
+            color: white;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #4caf50;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+
+        #cat {
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid #555;
+            padding: 21px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Upload Music</h1>
+    <form id="uploadForm">
+        <label for="musicTitle">Music Title:</label>
+        <input type="text" id="musicTitle" name="musicTitle" required>
+
+        <!-- <label for="category">Category:</label>
+        <input type="text" id="category" name="category" required> -->
+
+        <label for="category">Category:</label>
+        <div id="cat">
+            <div>
+                <input type="radio" id="kannada" name="category" value="kannada" required>
+                <label for="kannada">Kannada</label>
+            </div>
+            <div>
+                <input type="radio" id="english" name="category" value="english" required>
+                <label for="english">English</label>
+            </div>
+            <div>
+                <input type="radio" id="hindi" name="category" value="hindi" required>
+                <label for="hindi">Hindi</label>
+            </div>
+        </div>
+
+        <label for="musicFile">Select Music File:</label>
+        <input type="file" id="musicFile" name="musicFile" accept="audio/*" required>
+
+        <label for="imageFile">Select Image File:</label>
+        <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
+
+        <button type="button" onclick="uploadFile()">Upload</button>
+    </form>
+
+    <script>
+        // Setting up Firebase with our website
+        const firebaseConfig = {
+            apiKey: "AIzaSyBqoIMfnffBzB_vm8vlazBlprU1Vdph5vs",
+            authDomain: "music-8af6d.firebaseapp.com",
+            databaseURL: "https://music-8af6d-default-rtdb.firebaseio.com",
+            projectId: "music-8af6d",
+            storageBucket: "music-8af6d.appspot.com",
+            messagingSenderId: "629360725240",
+            appId: "1:629360725240:web:9340450f038bbf146dff0d",
+            measurementId: "G-47V0K2YNLP"
+        };
+
+        const firebaseApp = firebase.initializeApp(firebaseConfig);
+        const db = firebaseApp.database(); // Use Realtime Database instead of Firestore
+
+        function uploadFile() {
+            // Get input values
+            const musicTitle = document.getElementById('musicTitle').value;
+            const categoryElements = document.getElementsByName('category');
+            let category = '';
+
+            // Find the selected category
+            for (const element of categoryElements) {
+                if (element.checked) {
+                    category = element.value;
+                    break;
+                }
+            }
+
+            const musicFile = document.getElementById('musicFile').files[0];
+            const imageFile = document.getElementById('imageFile').files[0];
+
+
+            // Create a unique ID for the files
+            const fileId = Date.now().toString();
+
+            // Get references to Firebase Storage
+            const storageRef = firebase.storage().ref(`music/${category}/${fileId}`);
+
+            // Upload music file to Firebase Storage
+            const musicTask = storageRef.child(`${fileId}.mp3`).put(musicFile);
+
+            // Upload image file to Firebase Storage
+            const imageTask = storageRef.child(`${fileId}.jpg`).put(imageFile);
+
+            // Listen for state changes, errors, and completion of the music upload.
+            musicTask.on(
+                'state_changed',
+                function (snapshot) {
+                    // Update progress bar during the upload
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    document.querySelector('.progress-bar-fill').style.width = progress + '%';
+                },
+                function (error) {
+                    console.error(error.message);
+                    alert('Upload failed. Please try again.');
+                },
+                function () {
+                    // Get download URL for the uploaded music file
+                    musicTask.snapshot.ref.getDownloadURL().then(function (musicUrl) {
+                        // Get download URL for the uploaded image file
+                        imageTask.snapshot.ref.getDownloadURL().then(function (imageUrl) {
+                            // Save metadata to Firebase Realtime Database
+                            db.ref('music/' + fileId).set({
+                                title: musicTitle,
+                                category: category,
+                                musicUrl: musicUrl,
+                                imageUrl: imageUrl,
+                            });
+
+                            alert('Upload successful!');
+                        });
+                    });
+                }
+            );
+        }
+
+    </script>
+</body>
+
+</html>
