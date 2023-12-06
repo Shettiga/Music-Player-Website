@@ -7,23 +7,42 @@
   messagingSenderId: "532774111499",
   appId: "1:532774111499:web:de3f1759a2fbf70c27ba0e"
  });
-   const db = firebaseApp.firestore();
-   const auth = firebaseApp.auth();
-
-   const signup=()=>{
-    const email = document.getElementById("email").Value;
-    const password = document.getElementById("password").Value;
-    console.log(email,password)
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-  .then((result) => {
-    // Signed in 
-   location.href="music.html"
-    // ...
-  })
-  .catch((error) => {
-    console.log(error.code);
-    console.log(error.message)
-    // ..
-  });
-   }
+ const db = firebaseApp.firestore();
+ const auth = firebaseApp.auth();
+ 
+ const signup = () => {
+   const emailInput = document.getElementById("email");
+   const passwordInput = document.getElementById("password");
+ 
+   const email = emailInput.value;
+   const password = passwordInput.value;
+ 
+   console.log(email, password);
+ 
+   auth.createUserWithEmailAndPassword(email, password)
+     .then((userCredential) => {
+       const user = userCredential.user;
+       const uid = user.uid;
+ 
+       // Set isAdmin to true if email ends with @admin.com
+       const isAdmin = email.endsWith('@admin.com');
+ 
+       // Add user data to Firestore
+       db.collection("users").doc(uid).set({
+         email: email,
+         isAdmin: isAdmin,
+       })
+         .then(() => {
+           console.log("User data added to Firestore");
+           location.href = "music.html";
+         })
+         .catch((error) => {
+           console.error("Error adding user data to Firestore:", error);
+         });
+     })
+     .catch((error) => {
+       console.error("Error creating user:", error.code, error.message);
+     });
+ };
+   
    

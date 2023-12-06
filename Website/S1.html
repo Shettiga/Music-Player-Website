@@ -19,7 +19,7 @@
         <a href="#" onclick="redirectToMusic()">Songs</a>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
-        <a href="#contact">Admin Page</a>
+        <a href="admin_upload (1).html" id="adminButton" style="display: none;">Admin Page</a>
         <a style="align-items: center; translate: -50% ;float: right;margin-top: -10%;" href="#" onclick="logout()"> <img id=""
                 height="30px" width="30px" src="log_out.png"></a>
     </nav>
@@ -115,7 +115,37 @@
                     }
             });
         }
-    
+
+        function checkAdminUser() {
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      const uid = user.uid;
+
+      // Retrieve user data from Firestore
+      db.collection("users").doc(uid).get()
+        .then((doc) => {
+          if (doc.exists) {
+            const isAdmin = doc.data().isAdmin;
+
+            if (isAdmin) {
+              document.getElementById('adminButton').style.display = 'block';
+            } else {
+              document.getElementById('adminButton').style.display = 'none';
+            }
+          } else {
+            console.error("No such document!");
+          }
+        })
+        .catch((error) => {
+          console.error("Error getting user data from Firestore:", error);
+        });
+    }
+  });
+}
+
+// Call the function to check admin user on page load
+checkAdminUser();
+
     </script>
 </body>
 
