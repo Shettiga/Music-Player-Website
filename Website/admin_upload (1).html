@@ -23,6 +23,78 @@
             background-attachment: fixed;
         }
 
+        #musicList {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #000;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .music-item {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding: 15px 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .music-item:last-child {
+            border-bottom: none;
+        }
+
+        .music-item:hover {
+            background-color: #333;
+        }
+
+        .music-info {
+            flex: 1;
+            margin-left: 15px;
+        }
+
+        .music-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .music-category {
+            font-size: 14px;
+            color: #888;
+        }
+
+
+        .music-item {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding: 15px 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        /* New styles for music images */
+        .music-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 4px;
+            margin-right: 15px;
+        }
+
+        /* Adjusted styles for music info */
+        .music-info {
+            flex: 1;
+        }
+
+        .music-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
         h1 {
             color: #f8f5f5;
         }
@@ -92,6 +164,12 @@
             border: 1px solid #555;
             padding: 21px;
         }
+
+        .delete-checkbox {
+            width: 20px;
+            height: 20px;
+            margin: auto 2%;
+        }
     </style>
 </head>
 
@@ -126,20 +204,31 @@
         <label for="imageFile">Select Image File:</label>
         <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
 
+        <div class="progress-bar" id="upload-progress-bar">
+            <div class="progress-bar-fill"></div>
+        </div>
+
+
         <button type="button" onclick="uploadFile()">Upload</button>
     </form>
+
     <div id="musicList"></div>
+
+    </div>
+    <button onclick="deleteSelectedMusic()">Delete Selected</button>
+
     <script>
         // Setting up Firebase with our website
         const firebaseConfig = {
-    apiKey: "AIzaSyCRDHxxkCXyNZ9BdJhDlZKpOkLu2FZHmh8",
-    authDomain: "auth-form-2eb89.firebaseapp.com",
-    databaseURL: "https://auth-form-2eb89-default-rtdb.firebaseio.com",
-    projectId: "auth-form-2eb89",
-    storageBucket: "auth-form-2eb89.appspot.com",
-    messagingSenderId: "532774111499",
-    appId: "1:532774111499:web:de3f1759a2fbf70c27ba0e"
-  };
+            apiKey: "AIzaSyBqoIMfnffBzB_vm8vlazBlprU1Vdph5vs",
+            authDomain: "music-8af6d.firebaseapp.com",
+            databaseURL: "https://music-8af6d-default-rtdb.firebaseio.com",
+            projectId: "music-8af6d",
+            storageBucket: "music-8af6d.appspot.com",
+            messagingSenderId: "629360725240",
+            appId: "1:629360725240:web:9340450f038bbf146dff0d",
+            measurementId: "G-47V0K2YNLP"
+        };
 
         const firebaseApp = firebase.initializeApp(firebaseConfig);
         const db = firebaseApp.database(); // Use Realtime Database instead of Firestore
@@ -198,12 +287,97 @@
                                 musicUrl: musicUrl,
                                 imageUrl: imageUrl,
                             });
-
                             alert('Upload successful!');
+
+                            document.getElementById('musicTitle').value = '';
+                            document.querySelector('input[name="category"]:checked').checked = false;
+                            document.getElementById('musicFile').value = '';
+                            document.getElementById('imageFile').value = '';
+
+                            // Refresh the music list
+                            refreshMusicList();
                         });
                     });
                 }
             );
+        }
+        const musicRef = db.ref('music');
+
+        musicRef.once('value')
+            .then((snapshot) => {
+                const musicList = snapshot.val();
+                displayMusicList(musicList);
+            })
+            .catch((error) => {
+                console.error('Error fetching music:', error);
+            });
+
+        function displayMusicList(musicList) {
+            const musicListDiv = document.getElementById('musicList');
+            musicListDiv.innerHTML = '';
+
+            Object.keys(musicList).forEach((key) => {
+                const music = musicList[key];
+                const musicItem = document.createElement('div');
+                musicItem.classList.add('music-item');
+                musicItem.setAttribute('data-category', music.category.toLowerCase());
+
+                // Add a checkbox to each music item
+                musicItem.innerHTML = `
+                    <input type="checkbox" class="delete-checkbox" data-key="${key}">
+                    <img class="music-image" src="${music.imageUrl}" alt="Music Image">
+                    <div class="music-info" style="margin: auto;">
+                        <p class="music-title">${music.title}</p>
+                        <p class="music-category">${music.category}</p>
+                    </div>
+                `;
+                musicListDiv.appendChild(musicItem);
+
+
+            });
+
+            // Show all music initially
+            filterMusic('all');
+        }
+        function deleteSelectedMusic() {
+            const checkboxes = document.querySelectorAll('.delete-checkbox:checked');
+            checkboxes.forEach((checkbox) => {
+                const key = checkbox.getAttribute('data-key');
+                const deleteRef = db.ref('music/' + key);
+
+                // Listen for state changes, errors, and completion of the delete operation.
+                deleteRef.remove()
+                    .then(() => {
+                        // Successfully deleted
+                        alert('Deletion successful!');
+                    })
+                    .catch((error) => {
+                        // Error deleting
+                        console.error('Error deleting music:', error);
+                        alert('Deletion failed. Please try again.');
+                    });
+            });
+
+            // Clear input fields after successful deletion
+            // checkboxes.forEach((checkbox) => {
+            //     checkbox.checked = false;
+            // });
+
+            // Refresh the music list
+            refreshMusicList();
+        }
+
+        function refreshMusicList() {
+            const musicRef = db.ref('music');
+
+            musicRef.once('value')
+                .then((snapshot) => {
+                    const musicList = snapshot.val();
+                    displayMusicList(musicList);
+                })
+                .catch((error) => {
+                    console.error('Error fetching music:', error);
+                });
         }
 
         function displayMusicList(musicList) {

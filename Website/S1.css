@@ -89,20 +89,17 @@ nav a {
 }
 
 
-.categories {
+.player {
     position: relative;
     text-align: center;
-<<<<<<< HEAD
     margin:auto; 
-=======
     margin: 20px auto; /* Adjusted margin */
     display: flex;
     align-items: center;
     flex-direction: row;
->>>>>>> ae996a29c68b9c534ef2b7487752818a02f69b13
 }
 
-.index-category-box {
+.index-player-box {
     width: 200px;
     height: 200px;
     background-color: #111;
@@ -114,31 +111,6 @@ nav a {
     position: relative;
     margin: 2% auto;
     z-index: -1;
-}
-
-.index-category-box:nth-child(1) {
-    background-image: url("music.jpg");
-}
-
-.index-category-box:nth-child(2) {
-    background-image: url("music.jpg");
-}
-
-.index-category-box:nth-child(3) {
-    background-image: url("music.jpg");
-}
-
-.index-category-box:hover {
-    opacity: 0.5;
-}
-
-.index-category-box h3 {
-    font-size: 22px;
-    line-height: 28px;
-    text-align: center;
-    text-shadow: -2px 2px 4px #000;
-    margin: 0;
-    z-index: 100;
 }
 
 footer {
