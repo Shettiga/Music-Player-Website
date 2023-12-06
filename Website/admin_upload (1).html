@@ -128,19 +128,18 @@
 
         <button type="button" onclick="uploadFile()">Upload</button>
     </form>
-
+    <div id="musicList"></div>
     <script>
         // Setting up Firebase with our website
         const firebaseConfig = {
-            apiKey: "AIzaSyBqoIMfnffBzB_vm8vlazBlprU1Vdph5vs",
-            authDomain: "music-8af6d.firebaseapp.com",
-            databaseURL: "https://music-8af6d-default-rtdb.firebaseio.com",
-            projectId: "music-8af6d",
-            storageBucket: "music-8af6d.appspot.com",
-            messagingSenderId: "629360725240",
-            appId: "1:629360725240:web:9340450f038bbf146dff0d",
-            measurementId: "G-47V0K2YNLP"
-        };
+    apiKey: "AIzaSyCRDHxxkCXyNZ9BdJhDlZKpOkLu2FZHmh8",
+    authDomain: "auth-form-2eb89.firebaseapp.com",
+    databaseURL: "https://auth-form-2eb89-default-rtdb.firebaseio.com",
+    projectId: "auth-form-2eb89",
+    storageBucket: "auth-form-2eb89.appspot.com",
+    messagingSenderId: "532774111499",
+    appId: "1:532774111499:web:de3f1759a2fbf70c27ba0e"
+  };
 
         const firebaseApp = firebase.initializeApp(firebaseConfig);
         const db = firebaseApp.database(); // Use Realtime Database instead of Firestore
@@ -205,6 +204,30 @@
                     });
                 }
             );
+        }
+
+        function displayMusicList(musicList) {
+            const musicListDiv = document.getElementById('musicList');
+            musicListDiv.innerHTML = '';
+
+            Object.keys(musicList).forEach((key) => {
+                const music = musicList[key];
+                const musicItem = document.createElement('div');
+                musicItem.classList.add('music-item');
+                musicItem.setAttribute('data-category', music.category.toLowerCase()); // Assuming categories are lowercase
+                musicItem.innerHTML = `
+                    <img class="music-image" src="${music.imageUrl}" alt="Music Image">
+                    <div class="music-info">
+                        <p class="music-title">${music.title}</p>
+                        <p class="music-category">${music.category}</p>
+                    </div>
+                    <button onclick="playMusic('${music.musicUrl}')">Play</button>
+                `;
+                musicListDiv.appendChild(musicItem);
+            });
+
+            // Show all music initially
+            filterMusic('all');
         }
 
     </script>
