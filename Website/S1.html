@@ -16,12 +16,12 @@
 
     <nav>
         <a href="#conta">Home</a>
-        <a href="#catego">Songs</a>
+        <a href="#" onclick="redirectToMusic()">Songs</a>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
         <a href="#contact">Admin Page</a>
-        <a style="align-items: center; translate: -50% ;"> <img id="" height="30px" width="30px"
-                src="log_out.png">logout</a>
+        <a style="align-items: center; translate: -50% ;float: right;margin-top: -10%;" href="#" onclick="logout()"> <img id=""
+                height="30px" width="30px" src="log_out.png"></a>
     </nav>
     <div class="container" id="conta">
         <div class="wrapper">
@@ -30,8 +30,8 @@
             <img src="song1.jpg" height="500" width="1000">
         </div>
     </div>
-    <div class="categories" id="catego">
-        <a href="music.html" class="mus">
+    <div class="player" id="catego">
+        <a href="#" onclick="redirectToMusic()" class="mus">
             <div class="index-category-box">
                 <h3>Music-player</h3>
             </div>
@@ -67,7 +67,56 @@
     <footer>
         <p>&copy; 2023 My Music Website. All rights reserved.</p>
     </footer>
-    <script src="S1.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.3/firebase-auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1-0/firebase.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCRDHxxkCXyNZ9BdJhDlZKpOkLu2FZHmh8",
+            authDomain: "auth-form-2eb89.firebaseapp.com",
+            databaseURL: "https://auth-form-2eb89-default-rtdb.firebaseio.com",
+            projectId: "auth-form-2eb89",
+            storageBucket: "auth-form-2eb89.appspot.com",
+            messagingSenderId: "532774111499",
+            appId: "1:532774111499:web:de3f1759a2fbf70c27ba0e"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        function redirectToMusic() {
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    window.location.href = "music.html";
+                } else {
+                    const confirmation = confirm("You are not logged in. Do you want to sign in?");
+                    if (confirmation) {
+                        window.location.href = "signup.html";
+                    }
+                }
+            });
+        }
+        function logout() {
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    const confirmation = confirm("Are you sure you want to Logout?");
+                    if (confirmation) {
+                        firebase.auth().signOut().then(() => {
+                            // Sign-out successful.
+                            alert("Logout successful!");
+                            window.location.href = "signup.html"; // Redirect to the sign-in page after logout
+                        }).catch((error) => {
+                            // An error happened.
+                            console.error("Logout error:", error);
+                            alert("Logout failed. Please try again.");
+                        });
+                    }
+                }
+                else{
+                        window.location.href = "signup.html";
+                    }
+            });
+        }
+    
+    </script>
 </body>
 
 </html>
