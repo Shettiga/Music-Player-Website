@@ -122,25 +122,21 @@
       const uid = user.uid;
 
       // Retrieve user data from Firestore
-      db.collection("users").doc(uid).get()
-        .then((doc) => {
-          if (doc.exists) {
-            const isAdmin = doc.data().isAdmin;
+      firebase.database().ref('users/' + uid).once('value')
+                        .then((snapshot) => {
+                            const isAdmin = snapshot.val().isAdmin;
 
-            if (isAdmin) {
-              document.getElementById('adminButton').style.display = 'block';
-            } else {
-              document.getElementById('adminButton').style.display = 'none';
-            }
-          } else {
-            console.error("No such document!");
-          }
-        })
-        .catch((error) => {
-          console.error("Error getting user data from Firestore:", error);
-        });
-    }
-  });
+                            if (isAdmin) {
+                                document.getElementById('adminButton').style.display = 'block';
+                            } else {
+                                document.getElementById('adminButton').style.display = 'none';
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Error getting user data from Realtime Database:", error);
+                        });
+                }
+            });
 }
 
 // Call the function to check admin user on page load

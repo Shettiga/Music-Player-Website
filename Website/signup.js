@@ -1,13 +1,14 @@
 
  const firebaseApp = firebase.initializeApp({ 
   apiKey: "AIzaSyCRDHxxkCXyNZ9BdJhDlZKpOkLu2FZHmh8",
-  authDomain: "auth-form-2eb89.firebaseapp.com",
-  projectId: "auth-form-2eb89",
-  storageBucket: "auth-form-2eb89.appspot.com",
-  messagingSenderId: "532774111499",
-  appId: "1:532774111499:web:de3f1759a2fbf70c27ba0e"
+            authDomain: "auth-form-2eb89.firebaseapp.com",
+            databaseURL: "https://auth-form-2eb89-default-rtdb.firebaseio.com",
+            projectId: "auth-form-2eb89",
+            storageBucket: "auth-form-2eb89.appspot.com",
+            messagingSenderId: "532774111499",
+            appId: "1:532774111499:web:de3f1759a2fbf70c27ba0e"
  });
- const db = firebaseApp.firestore();
+ const db = firebase.database();
  const auth = firebaseApp.auth();
  
  const signup = () => {
@@ -24,25 +25,24 @@
        const user = userCredential.user;
        const uid = user.uid;
  
-       // Set isAdmin to true if email ends with @admin.com
        const isAdmin = email.endsWith('@admin.com');
- 
-       // Add user data to Firestore
-       db.collection("users").doc(uid).set({
-         email: email,
-         isAdmin: isAdmin,
+
+       // Add user data to Realtime Database
+       db.ref('users/' + uid).set({
+           email: email,
+           isAdmin: isAdmin,
        })
-         .then(() => {
-           console.log("User data added to Firestore");
-           location.href = "music.html";
-         })
-         .catch((error) => {
-           console.error("Error adding user data to Firestore:", error);
-         });
-     })
-     .catch((error) => {
+           .then(() => {
+               console.log("User data added to Realtime Database");
+               location.href = "music.html";
+           })
+           .catch((error) => {
+               console.error("Error adding user data to Realtime Database:", error);
+           });
+   })
+   .catch((error) => {
        console.error("Error creating user:", error.code, error.message);
-     });
- };
+   });
+}
    
    
