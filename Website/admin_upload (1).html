@@ -389,6 +389,7 @@
                 musicItem.classList.add('music-item');
                 musicItem.setAttribute('data-category', music.category.toLowerCase()); // Assuming categories are lowercase
                 musicItem.innerHTML = `
+                <input type="checkbox" class="delete-checkbox" data-key="${key}">
                     <img class="music-image" src="${music.imageUrl}" alt="Music Image">
                     <div class="music-info">
                         <p class="music-title">${music.title}</p>
